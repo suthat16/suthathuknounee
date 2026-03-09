@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SUTHAT ❤️ NOUNEE - Forever & Always</title>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* CSS ทุกอย่างเหมือนเดิมเป๊ะๆ ครับ */
+        :root { 
+            --rose-gold: #b76e79; 
+            --text-brown: #5d4037;
+            --heart-red: #e63946;
+        }
+        
+        body { 
+            margin: 0; 
+            background: linear-gradient(135deg, #fdfbfb 0%, #fcedf0 100%); 
+            color: var(--text-brown); 
+            font-family: 'Playfair Display', serif; 
+            overflow: hidden; height: 100vh; touch-action: manipulation; 
+            -webkit-tap-highlight-color: transparent; 
+        }
+        canvas#bg-canvas { position: absolute; top: 0; left: 0; z-index: 0; pointer-events: none; }
+
+        .heart-icon {
+            display: inline-block; color: var(--heart-red);
+            text-shadow: 0 0 15px rgba(230, 57, 70, 0.6);
+            animation: pulseHeart 1.2s infinite; font-style: normal;
+            -webkit-text-fill-color: var(--heart-red); 
+        }
+
+        #intro {
+            position: fixed; inset: 0; background: linear-gradient(135deg, #fdfbfb 0%, #fcedf0 100%); 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            z-index: 100; cursor: pointer; transition: 1s ease-in-out;
+        }
+        #intro h1 { 
+            font-family: 'Great Vibes', cursive; 
+            font-size: clamp(3.5rem, 15vw, 6rem); 
+            background: linear-gradient(to right, #9c5e67, #c58381, #9c5e67);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin: 0; font-weight: normal; text-align: center;
+        }
+        #intro p {
+            font-family: 'Nunito', sans-serif; color: var(--rose-gold); font-weight: 600;
+            letter-spacing: 2px; text-transform: uppercase; font-size: 0.85rem; margin-top: 20px;
+        }
+
+        .container { 
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            z-index: 10; display: none; flex-direction: column; align-items: center; width: 100%; 
+            opacity: 0; transition: 1.5s;
+        }
+        
+        #message-box {
+            background: rgba(255, 255, 255, 0.7); 
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(183, 110, 121, 0.3); 
+            color: var(--text-brown);
+            padding: 12px 30px; border-radius: 20px; 
+            font-size: clamp(1.2rem, 5vw, 1.5rem); margin-bottom: 25px; 
+            box-shadow: 0 10px 30px rgba(183, 110, 121, 0.1); 
+            text-align: center; transition: opacity 0.8s ease; width: 85%; max-width: 450px;
+        }
+
+        .book { 
+            width: 85vw; max-width: 320px; 
+            height: 110vw; max-height: 420px; 
+            position: relative; perspective: 1800px; cursor: pointer; 
+        }
+        .page { width: 100%; height: 100%; position: absolute; top: 0; left: 0; transform-origin: left; transform-style: preserve-3d; transition: 1s cubic-bezier(0.645, 0.045, 0.355, 1); z-index: 1;}
+        .flipped { transform: rotateY(-180deg); }
+        .face { 
+            position: absolute; width: 100%; height: 100%; backface-visibility: hidden; 
+            background: #fff; overflow: hidden;
+            border: 6px solid white; border-bottom: 25px solid white; 
+            border-radius: 4px; box-sizing: border-box;
+            box-shadow: 2px 5px 15px rgba(0,0,0,0.1), inset 0 0 0 1px rgba(212, 175, 55, 0.2);
+            display: flex; justify-content: center; align-items: center; 
+        }
+        .face-back { transform: rotateY(180deg); }
+        
+        .media-content { 
+            width: 100%; height: 100%; 
+            object-fit: contain; 
+            background-color: #fff; 
+            border-radius: 2px; 
+        }
+
+        #heart-scene { 
+            position: fixed; inset: 0; display: none; z-index: 15; 
+            background: transparent; transition: opacity 2s ease-in-out;
+        }
+        .mosaic-photo {
+            position: absolute; width: 14vw; height: 14vw; max-width: 55px; max-height: 55px;
+            border: 3px solid white; border-radius: 4px; 
+            object-fit: cover; 
+            box-shadow: 0 5px 15px rgba(183, 110, 121, 0.2);
+            transition: 2.5s cubic-bezier(0.19, 1, 0.22, 1); opacity: 0;
+            background-color: #fff;
+        }
+
+        #question-container { text-align: center; display: none; opacity: 0; transition: 1.5s; z-index: 20; flex-direction: column; align-items: center; width: 90%;}
+        
+        #question-container h1 {
+            font-family: 'Great Vibes', cursive; font-size: clamp(3rem, 12vw, 4.5rem); 
+            color: var(--rose-gold); margin-bottom: 5px; font-weight: normal; 
+        }
+        
+        #question-container p.main-question {
+            font-family: 'Playfair Display', serif; font-size: clamp(1.5rem, 7vw, 2rem); 
+            font-weight: 600; color: var(--text-brown); margin: 20px 0 35px 0;
+            background: rgba(255,255,255,0.8); padding: 15px 30px; border-radius: 15px;
+            border: 1px solid rgba(183, 110, 121, 0.3);
+            box-shadow: 0 8px 25px rgba(183, 110, 121, 0.15);
+        }
+
+        .btn-wrapper { display: flex; flex-direction: column; gap: 15px; align-items: center; position: relative; width: 100%; height: 130px;}
+        
+        .btn { 
+            border: none; padding: 15px 40px; font-size: 1.1rem; 
+            border-radius: 50px; font-family: 'Nunito', sans-serif;
+            font-weight: 700; letter-spacing: 1px; transition: 0.3s;
+            width: 80%; max-width: 260px; 
+        }
+        
+        .btn-yes {
+            background: linear-gradient(to right, #ff8a9d, #ffb199); 
+            color: white; box-shadow: 0 5px 15px rgba(255, 138, 157, 0.4); z-index: 2;
+        }
+        
+        #noBtn { 
+            position: absolute; top: 65px; background: white; color: var(--text-brown); 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); z-index: 999; border: 1px solid #e0c3c3;
+        }
+
+        #final-surprise {
+            position: fixed; inset: 0; display: none; z-index: 100; 
+            background: linear-gradient(135deg, #fdfbfb 0%, #fcedf0 100%); 
+            flex-direction: column; justify-content: center; align-items: center; text-align: center;
+        }
+        .ring-3d-final {
+            font-size: clamp(90px, 30vw, 120px); filter: drop-shadow(0 10px 30px rgba(255, 255, 255, 0.8));
+            animation: ringFloat 4s ease-in-out infinite; opacity: 0; transition: 2s;
+        }
+        .ring-sparkles {
+            position: absolute; width: 100%; height: 100%; pointer-events: none;
+            background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, transparent 60%);
+            mix-blend-mode: overlay; animation: rotateSparkle 10s linear infinite;
+        }
+        #premium-text-final {
+            font-family: 'Great Vibes', cursive; font-size: clamp(3rem, 10vw, 4.5rem); 
+            background: linear-gradient(to right, #9c5e67, #c58381, #9c5e67);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            opacity: 0; transition: 3s ease 1s; margin-top: 10px;
+        }
+        .forever-text {
+            font-family: 'Playfair Display', serif; font-size: clamp(1.2rem, 5vw, 1.5rem); 
+            color: var(--text-brown); display: block; margin-top: 5px; 
+            text-transform: lowercase; letter-spacing: 3px; opacity: 0; transition: 3s ease 1.5s;
+        }
+
+        @keyframes pulseHeart { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+        @keyframes ringFloat { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-15px) scale(1.02); } }
+        @keyframes rotateSparkle { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<audio id="bgm" loop preload="auto"><source src="images/music.mp3" type="audio/mpeg"></audio>
+<canvas id="bg-canvas"></canvas>
+
+<div id="intro">
+    <h1>Suthat <span class="heart-icon">❤️</span> Nounee</h1>
+    <p>Tap to open our story</p>
+</div>
+
+<div class="container" id="album-container">
+    <div id="message-box">Our Sweetest Memories</div>
+    <div class="book" id="myBook" onclick="flipNext()"></div>
+</div>
+
+<div id="heart-scene">
+    <div id="mosaic-container"></div>
+</div>
+
+<div class="container" id="question-container">
+    <h1>Suthat <span class="heart-icon" style="font-size: 0.8em;">❤️</span> Nounee</h1>
+    <p class="main-question">Nounee...<br>Will you be my girlfriend? 💍</p>
+    
+    <div class="btn-wrapper">
+        <button class="btn btn-yes" onclick="startFinalSurprise()">YES, I WILL! ❤️</button>
+        <button id="noBtn" class="btn" onmouseover="moveNo(event)" ontouchstart="moveNo(event)">No 🙈</button>
+    </div>
+</div>
+
+<div id="final-surprise">
+    <div style="position: relative;">
+        <div class="ring-sparkles"></div>
+        <div class="ring-3d-final" id="finalRing">💍</div>
+    </div>
+    <div id="premium-text-final">
+        Suthat <span class="heart-icon" style="font-size: 0.8em;">❤️</span> Nounee
+    </div>
+    <span class="forever-text" id="final-sub">forever & always</span>
+</div>
+
+<script>
+    // ส่วนที่ 1: รายชื่อไฟล์ (แก้ไขตรงนี้ได้เลยครับ)
+    const mediaFiles = [
+         "images/cover.jpg", "images/1.jpg", "images/2.mp4", "images/3.jpg", 
+        "images/4.jpg", "images/5.mp4", "images/6.jpg", "images/7.jpg", 
+        "images/8.jpg", "images/9.jpg", "images/10.mp4", "images/back.jpg"
+    ];
+
+    const messages = [
+        "Every moment with you is a gift...", "Building our world together...", 
+        "You make my heart smile.", "My favorite place is inside your hug.", 
+        "Thank you for being my happiness.", "I have a special question for you..."
+    ];
+    
+    // ส่วนที่ 2: ระบบ Auto-Generate หน้าสมุด (ปรับปรุงใหม่เพื่อให้แสดงครบทุกรูป)
+    const bookEl = document.getElementById('myBook');
+    // คำนวณจำนวนหน้า: ถ้ามีรูปคี่ ให้ปัดขึ้นเพื่อสร้างหน้าสุดท้ายที่เป็นหน้าหลังเปล่าๆ
+    const totalPages = Math.ceil(mediaFiles.length / 2); 
+    let currentPage = 1;
+
+    function buildBook() {
+        for (let i = 0; i < totalPages; i++) {
+            const page = document.createElement('div');
+            page.className = 'page';
+            page.id = `page${i + 1}`;
+            page.style.zIndex = totalPages - i; // จัดลำดับหน้าจากบนลงล่าง
+
+            // คำนวณ Index ของรูปที่จะใส่ในหน้าหน้าและหน้าหลัง
+            const frontIdx = i * 2;
+            const backIdx = i * 2 + 1;
+
+            page.innerHTML = `
+                <div class="face face-front">${createMediaTag(mediaFiles[frontIdx])}</div>
+                <div class="face face-back">${backIdx < mediaFiles.length ? createMediaTag(mediaFiles[backIdx]) : ''}</div>
+            `;
+            bookEl.appendChild(page);
+        }
+    }
+
+    // ฟังก์ชันช่วยสร้าง HTML Tag สำหรับรูปหรือวิดีโอ
+    function createMediaTag(file) {
+        if (!file) return ''; // กัน Error กรณีไม่มีไฟล์
+        const isVideo = file.match(/\.(mp4|mov|webm|ogg)$/i);
+        if (isVideo) {
+            // ใส่ Attribute ครบถ้วนเพื่อให้เล่นบนมือถือได้ลื่นไหล
+            return `<video class="media-content" src="${file}#t=0.001" autoplay loop muted playsinline webkit-playsinline preload="auto"></video>`;
+        } else {
+            return `<img class="media-content" src="${file}" loading="lazy">`;
+        }
+    }
+
+    // ส่วนที่ 3: ฟังก์ชันการทำงานเดิมทั้งหมด (ไม่มีการแก้ไขโครงสร้าง)
+    function startApp() {
+        const intro = document.getElementById('intro');
+        const album = document.getElementById('album-container');
+        document.getElementById("bgm").play().catch(() => {});
+        intro.style.opacity = "0";
+        setTimeout(() => { intro.style.display = "none"; album.style.display = "flex"; setTimeout(() => album.style.opacity = "1", 100); }, 1000);
+        document.removeEventListener('click', startApp);
+        document.removeEventListener('touchstart', startApp);
+    }
+    
+    document.addEventListener('click', startApp);
+    document.addEventListener('touchstart', startApp);
+    buildBook(); // เรียกใช้ฟังก์ชันสร้างหน้าสมุด
+
+    function flipNext() {
+        if (currentPage <= totalPages) {
+            const page = document.getElementById(`page${currentPage}`);
+            page.classList.add('flipped');
+            // ปรับ z-index เมื่อเปิดหน้าไปแล้ว เพื่อให้หน้าถัดไปอยู่บนสุด
+            page.style.zIndex = currentPage; 
+            
+            // กระตุ้นวิดีโอในหน้าปัจจุบันให้เล่น
+            page.querySelectorAll('video').forEach(v => v.play().catch(() => {}));
+
+            currentPage++;
+            const msgBox = document.getElementById('message-box');
+            msgBox.style.opacity = "0";
+            
+            setTimeout(() => { 
+                let msgIndex = currentPage - 2;
+                if(msgIndex < 0) msgIndex = 0;
+                if(msgIndex >= messages.length) msgIndex = messages.length - 1;
+                
+                msgBox.innerText = messages[msgIndex]; 
+                msgBox.style.opacity = "1"; 
+            }, 600);
+            
+            if (currentPage > totalPages) {
+                setTimeout(showHeartBeforeQuestion, 2000);
+            }
+        }
+    }
+
+    function showHeartBeforeQuestion() {
+        // ใช้เอฟเฟกต์การย้ายหน้าจอเดิมเป๊ะๆ
+        document.getElementById("album-container").style.opacity = "0";
+        setTimeout(() => {
+            document.getElementById("album-container").style.display = "none";
+            document.getElementById("heart-scene").style.display = "block";
+            
+            const container = document.getElementById("mosaic-container");
+            const points = [];
+            const scale = window.innerWidth < 500 ? 9 : 14; 
+            for (let t = 0; t < Math.PI * 2; t += 0.25) { 
+                const x = 16 * Math.pow(Math.sin(t), 3);
+                const y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+                points.push({ x: x * scale, y: y * scale });
+            }
+            
+            // ใช้เฉพาะรูปภาพเรียงเป็นหัวใจเหมือนเดิม
+            const imgFilesOnly = mediaFiles.filter(f => !f.match(/\.(mp4|mov|webm)$/i));
+
+            points.forEach((p, i) => {
+                if(imgFilesOnly.length === 0) return; 
+                const img = document.createElement("img");
+                img.src = imgFilesOnly[i % imgFilesOnly.length];
+                img.className = "mosaic-photo";
+                img.style.left = "50%"; img.style.top = "110%"; 
+                container.appendChild(img);
+                setTimeout(() => {
+                    img.style.opacity = "1";
+                    img.style.left = `calc(50% + ${p.x}px)`;
+                    img.style.top = `calc(50% + ${p.y}px)`;
+                    img.style.transform = `translate(-50%, -50%) rotate(${Math.random()*20-10}deg)`;
+                }, 100 + (i * 90));
+            });
+
+            setTimeout(() => {
+                document.getElementById("heart-scene").style.opacity = "0";
+                setTimeout(() => {
+                    document.getElementById("heart-scene").style.display = "none";
+                    document.getElementById("question-container").style.display = "flex";
+                    setTimeout(() => document.getElementById("question-container").style.opacity = "1", 100);
+                }, 2000);
+            }, 5500);
+        }, 1000);
+    }
+
+    function moveNo(e) {
+        if(e) e.preventDefault(); 
+        const btn = document.getElementById("noBtn");
+        btn.style.position = "fixed";
+        btn.style.zIndex = "999";
+        btn.style.left = Math.random() * 60 + 10 + "vw";
+        btn.style.top = Math.random() * 60 + 20 + "vh";
+    }
+
+    function startFinalSurprise() {
+        document.getElementById("question-container").style.opacity = "0";
+        setTimeout(() => {
+            document.getElementById("question-container").style.display = "none";
+            const final = document.getElementById("final-surprise");
+            final.style.display = "flex";
+            setTimeout(() => {
+                document.getElementById("finalRing").style.opacity = "1";
+                document.getElementById("premium-text-final").style.opacity = "1";
+                document.getElementById("final-sub").style.opacity = "1";
+            }, 500);
+        }, 1000);
+    }
+
+    // พื้นหลังหัวใจลอยเดิม
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    let bgHearts = [];
+    function initCanvas() {
+        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+        bgHearts = [];
+        for (let i = 0; i < 40; i++) bgHearts.push({ 
+            x: Math.random()*canvas.width, y: Math.random()*canvas.height, 
+            size: Math.random()*10 + 8, opacity: Math.random() * 0.4 + 0.1, 
+            speed: Math.random()*0.5 + 0.2 
+        });
+    }
+    function drawCanvas() {
+        ctx.clearRect(0,0,canvas.width,canvas.height); 
+        bgHearts.forEach(h => {
+            h.y -= h.speed; 
+            if (h.y < -20) { h.y = canvas.height + 20; h.x = Math.random()*canvas.width; }
+            ctx.font = h.size + "px Arial";
+            ctx.fillStyle = `rgba(220, 150, 160, ${h.opacity})`; 
+            ctx.fillText("❤", h.x, h.y);
+        });
+        requestAnimationFrame(drawCanvas);
+    }
+    window.addEventListener('resize', initCanvas);
+    initCanvas(); drawCanvas();
+</script>
+
+</body>
+</html>
